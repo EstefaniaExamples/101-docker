@@ -4,12 +4,13 @@ services:
   example1:
     image: docker.io/library/jibber-benchmark:buildpacks-jvm.0.0.1-SNAPSHOT
     ports:
-      - 8080:8080
+      - "8080:8080"
     depends_on:
       - "prometheus"
       - "grafana"
     networks:
       - usecase2
+
   prometheus:
     image: prom/prometheus
     extra_hosts: ['host.docker.internal:host-gateway']
@@ -24,6 +25,7 @@ services:
       - --config.file=/etc/prometheus/prometheus.yml
     networks:
       - usecase2
+
   grafana:
     image: grafana/grafana-oss
     extra_hosts: ['host.docker.internal:host-gateway']
@@ -41,8 +43,33 @@ services:
       - "3000:3000"
     networks:
       - usecase2
+
+  tempo:
+    image: grafana/tempo
+    extra_hosts: ['host.docker.internal:host-gateway']
+    command: [ "-config.file=/etc/tempo.yaml" ]
+    volumes:
+      - ./docker/tempo/tempo-local.yaml:/etc/tempo.yaml:ro
+      - ./tempo-data:/tmp/tempo
+    ports:
+      - "14268"  # jaeger ingest
+      - "9411:9411" # zipkin
+
+  loki:
+    image: grafana/loki
+    extra_hosts: ['host.docker.internal:host-gateway']
+    command: [ "-config.file=/etc/loki/local-config.yaml" ]
+    ports:
+      - "3100:3100"                                   # loki needs to be exposed so it receives logs
+    environment:
+      - JAEGER_AGENT_HOST=tempo
+      - JAEGER_ENDPOINT=http://tempo:14268/api/traces # send traces to Tempo
+      - JAEGER_SAMPLER_TYPE=const
+      - JAEGER_SAMPLER_PARAM=1
+
 networks:
   usecase2:
+
 
 # Prometheus: http://localhost:9090/
 # Grafana: http://localhost:3000/
