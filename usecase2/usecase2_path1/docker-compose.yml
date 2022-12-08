@@ -1,15 +1,15 @@
 version: '3'
 
 services:
-  example1:
-    image: docker.io/library/jibber-benchmark:buildpacks-jvm.0.0.1-SNAPSHOT
-    ports:
-      - "8080:8080"
-    depends_on:
-      - "prometheus"
-      - "grafana"
-    networks:
-      - usecase2
+#  example1:
+#    image: docker.io/library/jibber-benchmark:buildpacks-jvm.0.0.1-SNAPSHOT
+#    ports:
+#      - "8080:8080"
+#    depends_on:
+#      - "prometheus"
+#      - "grafana"
+#    networks:
+#      - usecase2
 
   prometheus:
     image: prom/prometheus
@@ -49,7 +49,7 @@ services:
     extra_hosts: ['host.docker.internal:host-gateway']
     command: [ "-config.file=/etc/tempo.yaml" ]
     volumes:
-      - ./docker/tempo/tempo-local.yaml:/etc/tempo.yaml:ro
+      - ./monitoring/tempo/tempo-local.yaml:/etc/tempo.yaml:ro
       - ./tempo-data:/tmp/tempo
     ports:
       - "14268"  # jaeger ingest

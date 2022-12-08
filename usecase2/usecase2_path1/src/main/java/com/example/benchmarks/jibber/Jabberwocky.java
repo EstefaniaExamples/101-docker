@@ -3,6 +3,8 @@ package com.example.benchmarks.jibber;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Service;
 import rita.RiMarkov;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Utility class, that is a Singleton, that generates nonsense verse in the style of
@@ -12,7 +14,8 @@ import rita.RiMarkov;
 @Service
 @Scope("singleton")
 public class Jabberwocky {
-    //
+    private static final Logger log = LoggerFactory.getLogger(Jabberwocky.class);
+
     private RiMarkov r;
 
     public Jabberwocky() {
@@ -21,6 +24,8 @@ public class Jabberwocky {
 
     private void loadModel() {
         //
+        log.info("Service to generate the list of random texts");
+
         String text = "’Twas brillig, and the slithy toves " +
                 "Did gyre and gimble in the wabe:" +
                 "All mimsy were the borogoves, " +
@@ -54,10 +59,12 @@ public class Jabberwocky {
     }
 
     public String generate() {
+        log.info("Within `generate` method");
         return generate(10);
     }
 
     public String generate(final int numLines) {
+        log.info("Within `generate` method with `numLines` as input");
         String[] lines = this.r.generate(numLines);
         StringBuffer b = new StringBuffer();
         for (int i=0; i< lines.length; i++) {
